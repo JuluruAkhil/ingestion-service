@@ -22,6 +22,9 @@ Required variables:
 - `CLICKHOUSE_USER`
 - `CLICKHOUSE_PASSWORD`
 
+Optional variables:
+- `INGESTION_CRON` (default: `0 */15 * * * *`)
+
 ## Database Setup
 Flyway runs on startup and creates:
 - `dhan_ohlc` (main data table)
