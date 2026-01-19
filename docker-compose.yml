@@ -1,0 +1,12 @@
+services:
+  ingestion-service:
+    image: "eternalbliss/ingestion-service:0.1"
+    environment:
+      - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
+      - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
+      - CLICKHOUSE_USER=${CLICKHOUSE_USER}
+      - CLICKHOUSE_PASSWORD=${CLICKHOUSE_PASSWORD}
+      - DOCKER_USERNAME=${DOCKER_USERNAME}
+      - DOCKER_PASSWORD=${DOCKER_PASSWORD}
+    restart: unless-stopped

@@ -1,0 +1,50 @@
+# Maven
+target/
+!.mvn/wrapper/maven-wrapper.jar
+!**/src/main/resources/**/target/
+*.log
+
+# Java
+*.class
+
+# IntelliJ IDEA
+.idea/
+*.iml
+*.iws
+*.ipr
+out/
+
+# VS Code
+.vscode/
+
+# Eclipse
+.classpath
+.project
+.settings/
+bin/
+
+# OS Specific
+.DS_Store
+Thumbs.db
+
+# Secrets and Environment Variables
+.env
+.env.*
+!.env.example
+
+# Python (since python-files/ directory exists)
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+.pytest_cache/
+
+# ClickHouse/DB specific (if any local data folders are created in project)
+# (Adjust if you have local docker volumes mapped inside the project)
+
+
+# CSV Data Files
+api-scrip-master-detailed.csv
+tickers.csv
+api-docs.json

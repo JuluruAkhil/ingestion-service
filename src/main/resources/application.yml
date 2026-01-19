@@ -1,0 +1,53 @@
+# Server Configuration
+server:
+  port: 8080
+
+spring:
+  # Flyway Configuration
+  flyway:
+    enabled: true
+    locations: classpath:db/migration
+
+  # Threading
+  threads:
+    virtual:
+      enabled: true
+
+# ClickHouse HTTP Configuration
+clickhouse:
+  http:
+    base-url: ${CLICKHOUSE_HTTP_BASE_URL:http://${CLICKHOUSE_HOST}:${CLICKHOUSE_PORT}}
+    database: ${CLICKHOUSE_DATABASE:default}
+    user: ${CLICKHOUSE_USER:}
+    password: ${CLICKHOUSE_PASSWORD:}
+
+# DhanHQ API Configuration
+dhan:
+  api:
+    base-url: https://api.dhan.co/v2
+    access-token: ${ACCESS_TOKEN}
+
+# Ingestion Service Configuration
+ingestion:
+  market:
+    # Nifty 50 Index Token (13) on NSE Index Segment (IDX_I) -> "NSE_IDX_Nifty_50"
+    # Note: The code will parse this to determine fetch logic
+    bellwether-symbol: NSE_IDX_Nifty_50
+    bellwether-fresh-minutes: 5
+    bellwether-window-days: 7
+    update-bellwether-cursor: true
+
+  history:
+    # Default start date for new symbols (if not found in DB)
+    start-date: 2021-01-19
+    max-window-days: 89
+
+  scheduler:
+    # Scheduler: Run every 15 minutes between 3:00 and 11:45 UTC (covers 8:30 AM to 5:15 PM IST)
+    # Converted from 9-16 IST to UTC (IST is UTC+5:30)
+#    cron: "0 0/15 3-11 * * MON-FRI"
+    cron: "0 */15 * * * *"
+    stale-threshold-minutes: 5
+
+  concurrent:
+    max-tasks: 200
