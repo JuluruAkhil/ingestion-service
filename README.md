@@ -24,6 +24,7 @@ Required variables:
 
 Optional variables:
 - `INGESTION_CRON` (default: `0 */15 * * * *`)
+- `DHAN_INFLIGHT_LIMIT` (default: `10`)
 
 ## Database Setup
 Flyway runs on startup and creates:

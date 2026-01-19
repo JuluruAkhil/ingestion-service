@@ -13,6 +13,7 @@ import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.stream.Collectors;
 
 @Component
@@ -23,12 +24,17 @@ public class Scheduler {
     private final MarketStatusService marketStatusService;
     private final TickerRepository tickerRepository;
     private final IngestionService ingestionService;
+    private final AtomicBoolean jobRunning = new AtomicBoolean(false);
 
     @Value("${ingestion.scheduler.stale-threshold-minutes:5}")
     private int staleThresholdMinutes;
 
     @Scheduled(cron = "${ingestion.scheduler.cron}", zone = "UTC")
     public void runIngestionJob() {
+        if (!jobRunning.compareAndSet(false, true)) {
+            log.warn("Previous ingestion job still running. Skipping this run.");
+            return;
+        }
         try {
             log.info("Starting scheduled ingestion job...");
 
@@ -63,6 +69,8 @@ public class Scheduler {
             ingestionService.processTickersParallel(staleTickers, bellwetherTime);
         } catch (Exception e) {
             log.error("Critical error in ingestion scheduler", e);
+        } finally {
+            jobRunning.set(false);
         }
     }
 }

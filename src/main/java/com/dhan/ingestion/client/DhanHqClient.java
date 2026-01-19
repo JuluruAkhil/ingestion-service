@@ -2,7 +2,6 @@ package com.dhan.ingestion.client;
 
 import com.dhan.ingestion.domain.OhlcData;
 import com.dhan.ingestion.domain.Ticker;
-import io.github.resilience4j.ratelimiter.RateLimiter;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
@@ -20,22 +19,23 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.Semaphore;
 
 @Service
 @Slf4j
 public class DhanHqClient implements MarketDataClient {
 
     private final RestClient dhanRestClient;
-    private final RateLimiter rateLimiter;
+    private final Semaphore apiSemaphore;
     private final String baseUrl;
     private final String accessToken;
 
     public DhanHqClient(@Qualifier("dhanRestClient") RestClient dhanRestClient,
-                        RateLimiter rateLimiter,
+                        Semaphore dhanApiSemaphore,
                         @Value("${dhan.api.base-url}") String baseUrl,
                         @Value("${dhan.api.access-token}") String accessToken) {
         this.dhanRestClient = dhanRestClient;
-        this.rateLimiter = rateLimiter;
+        this.apiSemaphore = dhanApiSemaphore;
         this.baseUrl = baseUrl;
         this.accessToken = accessToken;
     }
@@ -65,58 +65,64 @@ public class DhanHqClient implements MarketDataClient {
                 "toDate", toDate
         );
 
-        // Blocking wait for permission
-        RateLimiter.waitForPermission(rateLimiter);
+        boolean acquired = false;
+        try {
+            apiSemaphore.acquire();
+            acquired = true;
 
-        String url = baseUrl + "/charts/intraday";
-        Map<String, String> headers = Map.of(
-                "access-token", accessToken,
-                "Content-Type", MediaType.APPLICATION_JSON_VALUE,
-                "Accept", MediaType.APPLICATION_JSON_VALUE
-        );
+            String url = baseUrl + "/charts/intraday";
 
-        for (int attempt = 1; attempt <= 3; attempt++) {
-            try {
-                Map<String, Object> response = dhanRestClient.post()
-                        .uri(url)
-                        .header("access-token", accessToken)
-                        .accept(MediaType.APPLICATION_JSON)
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .body(payload)
-                        .retrieve()
-                        .body(new ParameterizedTypeReference<Map<String, Object>>() {});
+            for (int attempt = 1; attempt <= 3; attempt++) {
+                try {
+                    Map<String, Object> response = dhanRestClient.post()
+                            .uri(url)
+                            .header("access-token", accessToken)
+                            .accept(MediaType.APPLICATION_JSON)
+                            .contentType(MediaType.APPLICATION_JSON)
+                            .body(payload)
+                            .retrieve()
+                            .body(new ParameterizedTypeReference<Map<String, Object>>() {});
 
-                if (response == null || !response.containsKey("timestamp")) {
-                    return Collections.emptyList();
-                }
-
-                return parseResponse(ticker.getSymbol(), response);
-            } catch (RestClientResponseException e) {
-                if (shouldRetryDhanError(e, attempt)) {
-                    long delayMs = attempt == 1 ? 5_000L : 10_000L;
-                    log.warn("Retrying DhanHQ request for {} {} -> {} (attempt {}/3 after {} ms)",
-                            ticker.getSymbol(), fromDate, toDate, attempt + 1, delayMs);
-                    try {
-                        Thread.sleep(delayMs);
-                    } catch (InterruptedException interruptedException) {
-                        Thread.currentThread().interrupt();
+                    if (response == null || !response.containsKey("timestamp")) {
                         return Collections.emptyList();
                     }
-                    continue;
-                }
-                if (e.getStatusCode().value() == 400 && e.getResponseBodyAsString() != null && e.getResponseBodyAsString().contains("DH-905")) {
-                    log.warn("DhanHQ returned DH-905 for {} {} -> {}", ticker.getSymbol(), fromDate, toDate);
+
+                    return parseResponse(ticker.getSymbol(), response);
+                } catch (RestClientResponseException e) {
+                    if (shouldRetryDhanError(e, attempt) || isRateLimited(e)) {
+                        long delayMs = attempt == 1 ? 5_000L : 10_000L;
+                        log.warn("Retrying DhanHQ request for {} {} -> {} (attempt {}/3 after {} ms)",
+                                ticker.getSymbol(), fromDate, toDate, attempt + 1, delayMs);
+                        try {
+                            Thread.sleep(delayMs);
+                        } catch (InterruptedException interruptedException) {
+                            Thread.currentThread().interrupt();
+                            return Collections.emptyList();
+                        }
+                        continue;
+                    }
+                    if (e.getStatusCode().value() == 400 && e.getResponseBodyAsString() != null && e.getResponseBodyAsString().contains("DH-905")) {
+                        log.warn("DhanHQ returned DH-905 for {} {} -> {}", ticker.getSymbol(), fromDate, toDate);
+                        return Collections.emptyList();
+                    }
+                    log.error("Error fetching data for {} {} -> {}", ticker.getSymbol(), fromDate, toDate, e);
+                    return Collections.emptyList();
+                } catch (Exception e) {
+                    log.error("Error fetching data for {} {} -> {}", ticker.getSymbol(), fromDate, toDate, e);
                     return Collections.emptyList();
                 }
-                log.error("Error fetching data for {} {} -> {}", ticker.getSymbol(), fromDate, toDate, e);
-                return Collections.emptyList();
-            } catch (Exception e) {
-                log.error("Error fetching data for {} {} -> {}", ticker.getSymbol(), fromDate, toDate, e);
-                return Collections.emptyList();
+            }
+
+            return Collections.emptyList();
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.warn("Interrupted while waiting for DhanHQ API slot for {}", ticker.getSymbol());
+            return Collections.emptyList();
+        } finally {
+            if (acquired) {
+                apiSemaphore.release();
             }
         }
-
-        return Collections.emptyList();
     }
 
     private List<OhlcData> parseResponse(String symbol, Map<String, Object> data) {
@@ -200,6 +206,18 @@ public class DhanHqClient implements MarketDataClient {
         }
         String body = e.getResponseBodyAsString();
         return body != null && body.contains("DH-905");
+    }
+
+    private boolean isRateLimited(RestClientResponseException e) {
+        int status = e.getStatusCode().value();
+        if (status == 429) {
+            return true;
+        }
+        String body = e.getResponseBodyAsString();
+        if (body == null || body.isBlank()) {
+            return false;
+        }
+        return body.contains("rate limit") || body.contains("too many requests");
     }
 
     private String sizeOf(Object value) {
