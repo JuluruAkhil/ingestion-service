@@ -3,6 +3,7 @@ services:
     image: "eternalbliss/ingestion-service:0.1"
     environment:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
+      - DHAN_CLIENT_ID=${DHAN_CLIENT_ID}
       - CLICKHOUSE_HOST=${CLICKHOUSE_HOST}
       - CLICKHOUSE_PORT=${CLICKHOUSE_PORT}
       - CLICKHOUSE_USER=${CLICKHOUSE_USER}

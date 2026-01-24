@@ -26,6 +26,7 @@ dhan:
   api:
     base-url: https://api.dhan.co/v2
     access-token: ${ACCESS_TOKEN}
+    client-id: ${DHAN_CLIENT_ID}
     inflight-limit: ${DHAN_INFLIGHT_LIMIT:10}
 
 # Ingestion Service Configuration

@@ -21,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Semaphore;
 
+import com.dhan.ingestion.config.AccessTokenStore;
+
 @Service
 @Slf4j
 public class DhanHqClient implements MarketDataClient {
@@ -28,16 +30,16 @@ public class DhanHqClient implements MarketDataClient {
     private final RestClient dhanRestClient;
     private final Semaphore apiSemaphore;
     private final String baseUrl;
-    private final String accessToken;
+    private final AccessTokenStore accessTokenStore;
 
     public DhanHqClient(@Qualifier("dhanRestClient") RestClient dhanRestClient,
                         Semaphore dhanApiSemaphore,
                         @Value("${dhan.api.base-url}") String baseUrl,
-                        @Value("${dhan.api.access-token}") String accessToken) {
+                        AccessTokenStore accessTokenStore) {
         this.dhanRestClient = dhanRestClient;
         this.apiSemaphore = dhanApiSemaphore;
         this.baseUrl = baseUrl;
-        this.accessToken = accessToken;
+        this.accessTokenStore = accessTokenStore;
     }
 
     @Override
@@ -74,9 +76,15 @@ public class DhanHqClient implements MarketDataClient {
 
             for (int attempt = 1; attempt <= 3; attempt++) {
                 try {
+                    String token = accessTokenStore.getAccessToken();
+                    if (token == null || token.isBlank()) {
+                        log.error("Missing DhanHQ access token; unable to fetch data for {}", ticker.getSymbol());
+                        return Collections.emptyList();
+                    }
+
                     Map<String, Object> response = dhanRestClient.post()
                             .uri(url)
-                            .header("access-token", accessToken)
+                            .header("access-token", token)
                             .accept(MediaType.APPLICATION_JSON)
                             .contentType(MediaType.APPLICATION_JSON)
                             .body(payload)
