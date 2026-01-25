@@ -4,7 +4,7 @@ ARG RUN_IMAGE=ghcr.io/bell-sw/alpaquita-linux-base:stream-musl
 FROM ${NIK_IMAGE} AS build
 WORKDIR /workspace
 COPY . .
-RUN ./mvnw -Pnative -DskipTests native:compile
+RUN ./mvnw -Pnative -DskipTests -Dnative-image.args=-H:StripDebugInfo=true native:compile
 
 FROM ${RUN_IMAGE}
 WORKDIR /app

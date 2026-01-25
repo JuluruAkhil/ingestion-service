@@ -1,0 +1,9 @@
+**/target
+.git
+.gitignore
+.idea
+.mvn
+.ruff_cache
+*.iml
+api-scrip-master-detailed.csv
+api-docs.json
