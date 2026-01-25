@@ -1,3 +1,4 @@
+# syntax=docker/dockerfile:1.7
 ARG NIK_IMAGE=ghcr.io/bell-sw/liberica-native-image-kit-container:jdk-25-nik-25.0-musl
 ARG RUN_IMAGE=ghcr.io/bell-sw/alpaquita-linux-base:stream-musl
 
