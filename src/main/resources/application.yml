@@ -46,7 +46,7 @@ ingestion:
     # Scheduler: Run every 15 minutes between 3:00 and 11:45 UTC (covers 8:30 AM to 5:15 PM IST)
     # Converted from 9-16 IST to UTC (IST is UTC+5:30)
 #    cron: "0 0/15 3-11 * * MON-FRI"
-    cron: ${INGESTION_CRON:0 */1 * * * *}
+    cron: ${INGESTION_CRON:0 */15 * * * *}
     stale-threshold-minutes: 5
 
   concurrent:
