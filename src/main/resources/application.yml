@@ -3,11 +3,6 @@ spring:
     web-application-type: none
     keep-alive: true
 
-  # Flyway Configuration
-  flyway:
-    enabled: true
-    locations: classpath:db/migration
-
   # Threading
   threads:
     virtual:

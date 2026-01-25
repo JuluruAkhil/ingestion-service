@@ -1,13 +1,16 @@
 package com.dhan.ingestion.repository;
 
 import com.dhan.ingestion.domain.OhlcData;
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.math.BigDecimal;
 import java.nio.charset.StandardCharsets;
@@ -136,7 +139,7 @@ public class OhlcRepository {
         return row.substring(quoteStart + 1, quoteEnd);
     }
 
-    private boolean handleClickhouseRowError(byte[] payloadBytes, org.springframework.web.client.RestClientResponseException ex) {
+    private boolean handleClickhouseRowError(byte[] payloadBytes, RestClientResponseException ex) {
         String body = ex.getResponseBodyAsString();
         Matcher matcher = CLICKHOUSE_ROW_PATTERN.matcher(body);
         if (!matcher.find()) {
@@ -177,7 +180,7 @@ public class OhlcRepository {
                     .uri(uriBuilder -> uriBuilder.path("/")
                             .queryParam("query", query)
                             .build())
-                    .contentType(org.springframework.http.MediaType.parseMediaType("application/json; charset=UTF-8"));
+                    .contentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
             if (!clickhouseUser.isBlank()) {
                 retryRequest = retryRequest.headers(headers -> headers.setBasicAuth(clickhouseUser, clickhousePassword));
             }
@@ -220,7 +223,7 @@ public class OhlcRepository {
                     .uri(uriBuilder -> uriBuilder.path("/")
                             .queryParam("query", query)
                             .build())
-                    .contentType(org.springframework.http.MediaType.parseMediaType("application/json; charset=UTF-8"));
+                    .contentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
             if (!clickhouseUser.isBlank()) {
                 request = request.headers(headers -> headers.setBasicAuth(clickhouseUser, clickhousePassword));
             }
@@ -229,7 +232,7 @@ public class OhlcRepository {
                     .toBodilessEntity();
             log.debug("Inserted {} rows into dhan_ohlc", batch.size());
             return true;
-        } catch (org.springframework.web.client.RestClientResponseException ex) {
+        } catch (RestClientResponseException ex) {
             if (handleClickhouseRowError(payloadBytes, ex)) {
                 return true;
             }
@@ -257,14 +260,14 @@ public class OhlcRepository {
                     .uri(uriBuilder -> uriBuilder.path("/")
                             .queryParam("query", query)
                             .build())
-                    .contentType(org.springframework.http.MediaType.parseMediaType("application/json; charset=UTF-8"));
+                    .contentType(MediaType.parseMediaType("application/json; charset=UTF-8"));
             if (!clickhouseUser.isBlank()) {
                 request = request.headers(headers -> headers.setBasicAuth(clickhouseUser, clickhousePassword));
             }
             request.body(rowBytes)
                     .retrieve()
                     .toBodilessEntity();
-        } catch (org.springframework.web.client.RestClientResponseException ex) {
+        } catch (RestClientResponseException ex) {
             log.error("Failed to insert OHLC row for {} (status={}): {} | row={}", ohlc.getSym(), ex.getStatusCode(), ex.getResponseBodyAsString(), row);
         } catch (Exception ex) {
             log.error("Failed to insert OHLC row for {} | row={}", ohlc.getSym(), row, ex);
@@ -301,7 +304,7 @@ public class OhlcRepository {
         row.put("time", time);
         try {
             return objectMapper.writeValueAsString(row);
-        } catch (com.fasterxml.jackson.core.JsonProcessingException e) {
+        } catch (JsonProcessingException e) {
             log.error("Failed to serialize OHLC row for {}", sym, e);
             return null;
         }

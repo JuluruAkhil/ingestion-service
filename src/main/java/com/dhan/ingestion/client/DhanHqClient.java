@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
+import java.math.BigDecimal;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -159,10 +160,10 @@ public class DhanHqClient implements MarketDataClient {
             long tsSeconds = requireEpochSeconds(symbol, i, timestamps.get(i));
             LocalDateTime time = LocalDateTime.ofInstant(Instant.ofEpochSecond(tsSeconds), ZoneId.of("Asia/Kolkata"));
 
-            java.math.BigDecimal openVal = java.math.BigDecimal.valueOf(requireNumber(symbol, "open", i, open.get(i)).doubleValue());
-            java.math.BigDecimal highVal = java.math.BigDecimal.valueOf(requireNumber(symbol, "high", i, high.get(i)).doubleValue());
-            java.math.BigDecimal lowVal = java.math.BigDecimal.valueOf(requireNumber(symbol, "low", i, low.get(i)).doubleValue());
-            java.math.BigDecimal closeVal = java.math.BigDecimal.valueOf(requireNumber(symbol, "close", i, close.get(i)).doubleValue());
+            BigDecimal openVal = BigDecimal.valueOf(requireNumber(symbol, "open", i, open.get(i)).doubleValue());
+            BigDecimal highVal = BigDecimal.valueOf(requireNumber(symbol, "high", i, high.get(i)).doubleValue());
+            BigDecimal lowVal = BigDecimal.valueOf(requireNumber(symbol, "low", i, low.get(i)).doubleValue());
+            BigDecimal closeVal = BigDecimal.valueOf(requireNumber(symbol, "close", i, close.get(i)).doubleValue());
             long vol = requireNumber(symbol, "volume", i, volume.get(i)).longValue();
             if (vol < 0) {
                 vol = 0;

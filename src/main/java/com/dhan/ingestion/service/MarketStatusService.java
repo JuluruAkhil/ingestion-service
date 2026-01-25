@@ -11,6 +11,8 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
 import java.util.List;
 
 @Service
@@ -40,7 +42,7 @@ public class MarketStatusService {
      */
     public MarketStatus getMarketStatus() {
         String symbol = bellwetherSymbolRaw;
-        LocalDateTime now = java.time.ZonedDateTime.now(java.time.ZoneId.of("Asia/Kolkata")).toLocalDateTime();
+        LocalDateTime now = ZonedDateTime.now(ZoneId.of("Asia/Kolkata")).toLocalDateTime();
 
         try {
             LocalDateTime windowStart = now.minusDays(bellwetherWindowDays);

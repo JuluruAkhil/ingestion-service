@@ -34,17 +34,8 @@
 		  <artifactId>spring-boot-starter-restclient</artifactId>
 		</dependency>
 		<dependency>
-		  <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-configuration-processor</artifactId>
-		  <optional>true</optional>
-		</dependency>
-		<dependency>
 		  <groupId>com.fasterxml.jackson.datatype</groupId>
 		  <artifactId>jackson-datatype-jsr310</artifactId>
-		</dependency>
-		<dependency>
-		  <groupId>org.springframework.cloud</groupId>
-		  <artifactId>spring-cloud-starter-circuitbreaker-resilience4j</artifactId>
 		</dependency>
 		<dependency>
 		  <groupId>org.projectlombok</groupId>
@@ -55,12 +46,6 @@
 		  <groupId>io.github.cdimascio</groupId>
 		  <artifactId>dotenv-java</artifactId>
 		  <version>${dotenv-java.version}</version>
-		</dependency>
-
-		<dependency>
-		  <groupId>org.springframework.boot</groupId>
-		  <artifactId>spring-boot-starter-restclient-test</artifactId>
-		  <scope>test</scope>
 		</dependency>
 	</dependencies>
 

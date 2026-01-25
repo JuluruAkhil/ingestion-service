@@ -1,6 +1,9 @@
 package com.dhan.ingestion.repository;
 
 import com.dhan.ingestion.domain.Ticker;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer;
+import com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.PropertyNamingStrategies;
 import lombok.extern.slf4j.Slf4j;
@@ -8,6 +11,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -39,12 +43,10 @@ public class TickerRepository {
         this.clickhouseRestClient = clickhouseRestClient;
         this.objectMapper = new ObjectMapper();
         this.objectMapper.setPropertyNamingStrategy(PropertyNamingStrategies.SNAKE_CASE);
-        var javaTimeModule = new com.fasterxml.jackson.datatype.jsr310.JavaTimeModule();
-        var formatter = java.time.format.DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-        javaTimeModule.addDeserializer(java.time.LocalDateTime.class,
-                new com.fasterxml.jackson.datatype.jsr310.deser.LocalDateTimeDeserializer(formatter));
-        javaTimeModule.addSerializer(java.time.LocalDateTime.class,
-                new com.fasterxml.jackson.datatype.jsr310.ser.LocalDateTimeSerializer(formatter));
+        var javaTimeModule = new JavaTimeModule();
+        var formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
+        javaTimeModule.addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer(formatter));
+        javaTimeModule.addSerializer(LocalDateTime.class, new LocalDateTimeSerializer(formatter));
         this.objectMapper.registerModule(javaTimeModule);
     }
 
@@ -64,7 +66,7 @@ public class TickerRepository {
                 request = request.headers(headers -> headers.setBasicAuth(clickhouseUser, clickhousePassword));
             }
             request.retrieve().toBodilessEntity();
-        } catch (org.springframework.web.client.RestClientResponseException ex) {
+        } catch (RestClientResponseException ex) {
             log.error("Failed to update ticker cursor for {} (status={}): {}", symbol, ex.getStatusCode(), ex.getResponseBodyAsString());
         } catch (Exception ex) {
             log.error("Failed to update ticker cursor for {}", symbol, ex);
@@ -96,7 +98,7 @@ public class TickerRepository {
         String response;
         try {
             response = request.retrieve().body(String.class);
-        } catch (org.springframework.web.client.RestClientResponseException ex) {
+        } catch (RestClientResponseException ex) {
             log.error("Failed to fetch tickers (status={}): {}", ex.getStatusCode(), ex.getResponseBodyAsString());
             return List.of();
         } catch (Exception ex) {
