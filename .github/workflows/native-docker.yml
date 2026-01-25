@@ -57,5 +57,5 @@ jobs:
           tags: |
             eternalbliss/ingestion-service:${{ steps.version.outputs.version }}
             eternalbliss/ingestion-service:latest
-            ghcr.io/juluruakhil/ingestion-service:${{ steps.version.outputs.version }}
-            ghcr.io/juluruakhil/ingestion-service:latest
+            ghcr.io/${{ github.actor }}/ingestion-service:${{ steps.version.outputs.version }}
+            ghcr.io/${{ github.actor }}/ingestion-service:latest
