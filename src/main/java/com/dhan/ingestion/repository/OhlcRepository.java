@@ -138,9 +138,6 @@ public class OhlcRepository {
 
     private boolean handleClickhouseRowError(byte[] payloadBytes, org.springframework.web.client.RestClientResponseException ex) {
         String body = ex.getResponseBodyAsString();
-        if (body == null) {
-            return false;
-        }
         Matcher matcher = CLICKHOUSE_ROW_PATTERN.matcher(body);
         if (!matcher.find()) {
             return false;
@@ -196,7 +193,7 @@ public class OhlcRepository {
 
     private boolean sendBatch(List<OhlcData> batch) {
         String payload = serializeRows(batch);
-        if (payload == null || payload.isBlank()) {
+        if (payload.isBlank()) {
             return true;
         }
         String[] lines = payload.split("\n");

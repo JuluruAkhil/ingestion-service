@@ -1,0 +1,12 @@
+ARG NIK_IMAGE=ghcr.io/bell-sw/liberica-native-image-kit-container:jdk-25-nik-25.0-musl
+ARG RUN_IMAGE=ghcr.io/bell-sw/alpaquita-linux-base:stream-musl
+
+FROM ${NIK_IMAGE} AS build
+WORKDIR /workspace
+COPY . .
+RUN ./mvnw -Pnative -DskipTests native:compile
+
+FROM ${RUN_IMAGE}
+WORKDIR /app
+COPY --from=build /workspace/target/ingestion-service /app/ingestion-service
+ENTRYPOINT ["/app/ingestion-service"]

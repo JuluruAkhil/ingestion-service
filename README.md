@@ -8,7 +8,7 @@ Fault-tolerant, high-concurrency data ingestion service for DhanHQ built with Sp
 - Runs concurrent fetches with resilient retry and rate limiting.
 
 ## Prerequisites
-1. Java 21
+1. Java 25
 2. ClickHouse running and reachable
 3. Maven Wrapper (`./mvnw`) is included
 
@@ -17,6 +17,7 @@ Copy `.env.example` to `.env` (or export variables in your shell) and fill in va
 
 Required variables:
 - `ACCESS_TOKEN`
+- `DHAN_CLIENT_ID`
 - `CLICKHOUSE_HOST`
 - `CLICKHOUSE_PORT`
 - `CLICKHOUSE_USER`

@@ -109,9 +109,12 @@ public class DhanHqClient implements MarketDataClient {
                         }
                         continue;
                     }
-                    if (e.getStatusCode().value() == 400 && e.getResponseBodyAsString() != null && e.getResponseBodyAsString().contains("DH-905")) {
-                        log.warn("DhanHQ returned DH-905 for {} {} -> {}", ticker.getSymbol(), fromDate, toDate);
-                        return Collections.emptyList();
+                    if (e.getStatusCode().value() == 400) {
+                        e.getResponseBodyAsString();
+                        if (e.getResponseBodyAsString().contains("DH-905")) {
+                            log.warn("DhanHQ returned DH-905 for {} {} -> {}", ticker.getSymbol(), fromDate, toDate);
+                            return Collections.emptyList();
+                        }
                     }
                     log.error("Error fetching data for {} {} -> {}", ticker.getSymbol(), fromDate, toDate, e);
                     return Collections.emptyList();
@@ -213,7 +216,7 @@ public class DhanHqClient implements MarketDataClient {
             return false;
         }
         String body = e.getResponseBodyAsString();
-        return body != null && body.contains("DH-905");
+        return body.contains("DH-905");
     }
 
     private boolean isRateLimited(RestClientResponseException e) {
@@ -222,7 +225,7 @@ public class DhanHqClient implements MarketDataClient {
             return true;
         }
         String body = e.getResponseBodyAsString();
-        if (body == null || body.isBlank()) {
+        if (body.isBlank()) {
             return false;
         }
         return body.contains("rate limit") || body.contains("too many requests");
