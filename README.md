@@ -43,6 +43,21 @@ Flyway runs on startup and creates:
    java -jar target/ingestion-service-0.0.1-SNAPSHOT.jar
    ```
 
+## Run with Docker Compose
+1. Copy `.env.example` to `.env` and fill in values (Docker Compose loads `.env` automatically).
+2. Pull and start the service:
+   ```bash
+   docker compose up -d
+   ```
+3. View logs:
+   ```bash
+   docker compose logs -f
+   ```
+4. Stop:
+   ```bash
+   docker compose down
+   ```
+
 ## Key Features
 - Bellwether check to skip cycles when no new data
 - Cursor-based sync for crash recovery

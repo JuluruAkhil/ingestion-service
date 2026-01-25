@@ -1,6 +1,6 @@
 services:
   ingestion-service:
-    image: "eternalbliss/ingestion-service:0.2"
+    image: "eternalbliss/ingestion-service:latest"
     environment:
       - ACCESS_TOKEN=${ACCESS_TOKEN}
       - DHAN_CLIENT_ID=${DHAN_CLIENT_ID}
