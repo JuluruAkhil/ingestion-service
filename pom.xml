@@ -11,7 +11,7 @@
 	<groupId>com.dhan</groupId>
 	<artifactId>ingestion-service</artifactId>
 	<version>0.3</version>
-	<name>ingestion-service</name>
+	<name>Ingestion Service</name>
 	<description>Fault-tolerant DhanHQ Data Ingestion Service</description>
 	<properties>
 		<java.version>25</java.version>
@@ -62,6 +62,12 @@
   	</dependencyManagement>
 
 	<build>
+		<resources>
+			<resource>
+				<directory>src/main/resources</directory>
+				<filtering>true</filtering>
+			</resource>
+		</resources>
 		<plugins>
 			<plugin>
 				<groupId>org.flywaydb</groupId>

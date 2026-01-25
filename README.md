@@ -34,13 +34,9 @@ Flyway runs on startup and creates:
 - Aggregation tables and views (2m .. 1M)
 
 ## How to Run
-1. Build:
+1. Run:
    ```bash
-   ./mvnw -DskipTests package
-   ```
-2. Run:
-   ```bash
-   java -jar target/ingestion-service-0.0.1-SNAPSHOT.jar
+   ./mvnw -DskipTests spring-boot:run
    ```
 
 ## Run with Docker Compose
