@@ -1,6 +1,6 @@
 # DhanHQ Ingestion Service
 
-Fault-tolerant, high-concurrency data ingestion service for DhanHQ built with Spring Boot 4 and Java 21.
+Fault-tolerant, high-concurrency data ingestion service for DhanHQ built with Spring Boot 4 and Java 25.
 
 ## What It Does
 - Pulls market data from DhanHQ and stores it in ClickHouse.
@@ -43,7 +43,7 @@ Flyway runs on startup and creates:
 1. Copy `.env.example` to `.env` and fill in values (Docker Compose loads `.env` automatically).
 2. Pull and start the service:
    ```bash
-   docker compose up -d
+   docker compose up -d --pull always
    ```
 3. View logs:
    ```bash
@@ -53,6 +53,14 @@ Flyway runs on startup and creates:
    ```bash
    docker compose down
    ```
+
+## Native Image (Docker)
+Build a native image inside a container and run it with a musl runtime base image:
+
+```bash
+docker build -f Dockerfile.native -t ingestion-service-native .
+docker run --rm ingestion-service-native
+```
 
 ## Key Features
 - Bellwether check to skip cycles when no new data
