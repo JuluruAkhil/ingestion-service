@@ -19,6 +19,9 @@ jobs:
           java-version: "25"
           cache: maven
 
+      - name: Make mvnw executable
+        run: chmod +x mvnw
+
       - name: Resolve version
         id: version
         run: |
