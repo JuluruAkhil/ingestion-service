@@ -19,13 +19,6 @@ jobs:
           java-version: "25"
           cache: maven
 
-      - name: Cache Maven repository
-        uses: actions/cache@v4
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-m2-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-m2-
 
       - name: Make mvnw executable
         run: chmod +x mvnw
@@ -52,6 +45,8 @@ jobs:
           file: Dockerfile.native
           platforms: linux/amd64
           push: true
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
           tags: |
             eternalbliss/ingestion-service:${{ steps.version.outputs.version }}
             eternalbliss/ingestion-service:latest
