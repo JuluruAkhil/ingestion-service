@@ -10,7 +10,7 @@
   </parent>
 	<groupId>com.dhan</groupId>
 	<artifactId>ingestion-service</artifactId>
-	<version>0.3</version>
+	<version>0.4</version>
 	<name>Ingestion Service</name>
 	<description>Fault-tolerant DhanHQ Data Ingestion Service</description>
 	<properties>

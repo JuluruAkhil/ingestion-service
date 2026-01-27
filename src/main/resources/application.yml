@@ -15,7 +15,7 @@ spring:
 clickhouse:
   http:
     base-url: ${CLICKHOUSE_HTTP_BASE_URL:http://${CLICKHOUSE_HOST}:${CLICKHOUSE_PORT}}
-    database: ${CLICKHOUSE_DATABASE:default}
+    database: ${CLICKHOUSE_DATABASE:}
     user: ${CLICKHOUSE_USER:}
     password: ${CLICKHOUSE_PASSWORD:}
 
@@ -26,6 +26,7 @@ dhan:
     access-token: ${ACCESS_TOKEN}
     client-id: ${DHAN_CLIENT_ID}
     inflight-limit: ${DHAN_INFLIGHT_LIMIT:10}
+    refresh-enabled: ${DHAN_REFRESH_ENABLED:true}
 
 # Ingestion Service Configuration
 ingestion:

@@ -176,7 +176,6 @@ public class DhanHqClient implements MarketDataClient {
                     .low(lowVal)
                     .close(closeVal)
                     .volume(vol)
-                    .openInterest(0L)
                     .time(time)
                     .build());
         }

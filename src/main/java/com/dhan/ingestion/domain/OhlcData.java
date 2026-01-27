@@ -19,6 +19,5 @@ public class OhlcData {
     private BigDecimal low;
     private BigDecimal close;
     private Long volume;
-    private Long openInterest;
     private LocalDateTime time;
 }

@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.ApplicationArguments;
 import org.springframework.boot.ApplicationRunner;
 import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.MediaType;
@@ -21,6 +22,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 
 @Component
 @Slf4j
+@ConditionalOnProperty(prefix = "dhan.api", name = "refresh-enabled", havingValue = "true", matchIfMissing = true)
 public class DhanTokenRefresher implements ApplicationRunner {
     private final RestClient dhanRestClient;
     private final AccessTokenStore accessTokenStore;

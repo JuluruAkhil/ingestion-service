@@ -158,7 +158,7 @@ public class OhlcRepository {
         }
         String badLine = lines[rowIndex - 1];
         String cleaned = badLine == null ? "" : badLine.replace("\u0000", "");
-        if (!isValidJsonEachRowLine(cleaned)) {
+        if (!isValidJsonEachRowLine(cleaned) || !isValidJsonObjectLine(cleaned)) {
             log.warn("Dropping bad row {} due to ClickHouse parse error (sym hint: {})", rowIndex, extractSymbolHint(cleaned));
             return true;
         }
@@ -190,6 +190,17 @@ public class OhlcRepository {
             return true;
         } catch (Exception retryEx) {
             log.error("Retry insert failed after dropping row {}", rowIndex, retryEx);
+            return false;
+        }
+    }
+
+    private boolean isValidJsonObjectLine(String row) {
+        if (!isValidJsonEachRowLine(row)) {
+            return false;
+        }
+        try {
+            return objectMapper.readTree(row).isObject();
+        } catch (Exception e) {
             return false;
         }
     }
@@ -287,10 +298,9 @@ public class OhlcRepository {
         BigDecimal low = toNumber(ohlc.getLow());
         BigDecimal close = toNumber(ohlc.getClose());
         Long volume = ohlc.getVolume();
-        Long openInterest = ohlc.getOpenInterest();
-        if (open == null || high == null || low == null || close == null || volume == null || openInterest == null) {
-            log.warn("Dropping OHLC row with missing fields: sym={} time={} open={} high={} low={} close={} volume={} openInterest={}",
-                    sym, time, open, high, low, close, volume, openInterest);
+        if (open == null || high == null || low == null || close == null || volume == null) {
+            log.warn("Dropping OHLC row with missing fields: sym={} time={} open={} high={} low={} close={} volume={}",
+                    sym, time, open, high, low, close, volume);
             return null;
         }
         LinkedHashMap<String, Object> row = new LinkedHashMap<>();
@@ -300,7 +310,6 @@ public class OhlcRepository {
         row.put("low", low);
         row.put("close", close);
         row.put("volume", volume);
-        row.put("open_interest", openInterest);
         row.put("time", time);
         try {
             return objectMapper.writeValueAsString(row);
