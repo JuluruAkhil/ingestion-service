@@ -6,17 +6,17 @@
 	<groupId>org.springframework.boot</groupId>
 	<artifactId>spring-boot-starter-parent</artifactId>
 	<version>4.0.2</version>
-	<relativePath/> <!-- lookup parent from repository -->
+	<relativePath/>
   </parent>
 	<groupId>com.dhan</groupId>
 	<artifactId>ingestion-service</artifactId>
-	<version>0.4</version>
+	<version>0.5</version>
 	<name>Ingestion Service</name>
 	<description>Fault-tolerant DhanHQ Data Ingestion Service</description>
 	<properties>
 		<java.version>25</java.version>
 		<start-class>com.dhan.ingestion.IngestionApplication</start-class>
-		<spring-cloud.version>2025.1.0</spring-cloud.version>
+		<spring-cloud.version>2025.1.1</spring-cloud.version>
 		<clickhouse-jdbc.version>0.9.6</clickhouse-jdbc.version>
 		<dotenv-java.version>3.0.2</dotenv-java.version>
 		<flyway.version>10.24.0</flyway.version>
@@ -24,11 +24,6 @@
 		<jib-maven-plugin.version>3.5.1</jib-maven-plugin.version>
 	</properties>
 	<dependencies>
-		<dependency>
-		  <groupId>org.flywaydb</groupId>
-		  <artifactId>flyway-database-clickhouse</artifactId>
-		  <version>${flyway.version}</version>
-		</dependency>
 		<dependency>
 		  <groupId>org.springframework.boot</groupId>
 		  <artifactId>spring-boot-starter-restclient</artifactId>
@@ -74,6 +69,11 @@
 				<artifactId>flyway-maven-plugin</artifactId>
 				<version>${flyway-maven-plugin.version}</version>
 				<dependencies>
+					<dependency>
+					  <groupId>org.flywaydb</groupId>
+					  <artifactId>flyway-database-clickhouse</artifactId>
+					  <version>${flyway.version}</version>
+					</dependency>
 					<dependency>
 						<groupId>com.clickhouse</groupId>
 						<artifactId>clickhouse-jdbc</artifactId>
