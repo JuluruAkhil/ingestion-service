@@ -45,8 +45,6 @@ jobs:
           file: Dockerfile.native
           platforms: linux/amd64
           push: true
-          cache-from: type=gha
-          cache-to: type=gha,mode=max
           tags: |
             eternalbliss/ingestion-service:${{ steps.version.outputs.version }}
             eternalbliss/ingestion-service:latest

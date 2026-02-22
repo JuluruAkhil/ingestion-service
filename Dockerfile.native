@@ -6,9 +6,9 @@ FROM ${NIK_IMAGE} AS build
 WORKDIR /workspace
 COPY .mvn .mvn
 COPY mvnw pom.xml ./
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -q -DskipTests dependency:go-offline
+RUN ./mvnw dependency:go-offline
 COPY src src
-RUN --mount=type=cache,target=/root/.m2 ./mvnw -Pnative -DskipTests -Dnative-image.args=-H:StripDebugInfo=true native:compile
+RUN ./mvnw -Pnative -Dnative-image.args=-H:StripDebugInfo=true native:compile
 
 FROM ${RUN_IMAGE}
 WORKDIR /app

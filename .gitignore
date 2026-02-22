@@ -49,3 +49,4 @@ scripts/
 api-scrip-master-detailed.csv
 tickers.csv
 api-docs.json
+/.agents
