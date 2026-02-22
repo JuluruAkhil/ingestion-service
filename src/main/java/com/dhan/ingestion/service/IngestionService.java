@@ -26,7 +26,6 @@ import java.util.concurrent.Semaphore;
 @RequiredArgsConstructor
 @Slf4j
 public class IngestionService {
-
     private final TickerRepository tickerRepository;
     private final OhlcRepository ohlcRepository;
     private final MarketDataClient marketDataClient;
@@ -137,5 +136,4 @@ public class IngestionService {
             inFlightSymbols.remove(symbol);
         }
     }
-
 }

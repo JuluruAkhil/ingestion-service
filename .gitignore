@@ -43,6 +43,7 @@ venv/
 # ClickHouse/DB specific (if any local data folders are created in project)
 # (Adjust if you have local docker volumes mapped inside the project)
 
+scripts/
 
 # CSV Data Files
 api-scrip-master-detailed.csv
