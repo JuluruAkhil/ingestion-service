@@ -5,12 +5,12 @@
   <parent>
 	<groupId>org.springframework.boot</groupId>
 	<artifactId>spring-boot-starter-parent</artifactId>
-	<version>4.0.2</version>
+	<version>4.0.3</version>
 	<relativePath/>
   </parent>
 	<groupId>com.dhan</groupId>
 	<artifactId>ingestion-service</artifactId>
-	<version>0.6</version>
+	<version>0.7</version>
 	<name>Ingestion Service</name>
 	<description>Fault-tolerant DhanHQ Data Ingestion Service</description>
 	<properties>
@@ -36,11 +36,6 @@
 		  <groupId>org.projectlombok</groupId>
 		  <artifactId>lombok</artifactId>
 		  <optional>true</optional>
-		</dependency>
-		<dependency>
-		  <groupId>io.github.cdimascio</groupId>
-		  <artifactId>dotenv-java</artifactId>
-		  <version>${dotenv-java.version}</version>
 		</dependency>
 	</dependencies>
 
